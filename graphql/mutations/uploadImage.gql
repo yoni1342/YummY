@@ -1,0 +1,5 @@
+mutation ImageUploadMutation($image: [ImageUploadInput]!) {
+  uploadImage(arg1: $image){
+    urls
+  }
+}

@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+    .header{
+        @apply text-4xl font-quicksand font-bold text-primary;
+    }
+    .container{
+        @apply mx-auto md:px-[4px] lg:px-[30px];
+    }
+    .btn{
+        @apply px-5 xl:px-10 py-2 bg-primary text-white rounded-full cursor-pointer hover:bg-primary/80 active:scale-90 transition-transform ease-in-out duration-150 font-quicksand font-semibold;
+    }
+    .input{
+        @apply w-72 py-1  px-0 border-b-2 font-montserrat border-gray-400 appearance-none dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-[#cf3333]
+    }
+}

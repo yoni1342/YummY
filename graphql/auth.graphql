@@ -1,0 +1,40 @@
+query MyQuery($limit: Int) {
+  users(limit: $limit) {
+    email
+    id
+  }
+}
+
+mutation SignInMutation($email: String!, $password: String!) {
+  signIn(credential: {email: $email, password: $password}){
+    data{
+      id
+      accessToken
+      email
+      first_name
+      last_name
+      profile_picture
+    }
+    message
+  }
+}
+
+
+mutation SignOutMutation(
+  $email: String!
+  $first_name: String!
+  $last_name: String!
+  $password: String!
+) {
+  signup(
+    userData: {
+      email: $email
+      first_name: $first_name
+      last_name: $last_name
+      password: $password
+    }
+  ) {
+    message
+    success
+  }
+}

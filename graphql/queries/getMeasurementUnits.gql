@@ -1,0 +1,5 @@
+query MyQuery {
+  measurement {
+    unit_name
+  }
+}

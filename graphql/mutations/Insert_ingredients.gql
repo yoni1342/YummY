@@ -1,0 +1,8 @@
+mutation MyMutation($ingredient: [ingredients_insert_input!]!) {
+  insert_ingredients(objects: $ingredient) {
+    returning {
+      name
+      picture
+    }
+  }
+}
