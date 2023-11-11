@@ -1,0 +1,5 @@
+mutation MyMutation($id:uuid!) {
+  delete_recipes_by_pk(recipe_id: $id){
+    recipe_id
+  }
+}

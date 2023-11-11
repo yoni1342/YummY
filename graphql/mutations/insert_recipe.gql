@@ -1,0 +1,5 @@
+mutation MyMutation($obj:recipes_insert_input!) {
+  insert_recipes_one(object: $obj){
+    recipe_id
+  }
+}

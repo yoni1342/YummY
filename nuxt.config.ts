@@ -16,7 +16,9 @@ export default defineNuxtConfig({
     "@vee-validate/nuxt",
     "@pinia/nuxt",
     "@vueuse/nuxt",
-    "@pinia-plugin-persistedstate/nuxt"
+    "@pinia-plugin-persistedstate/nuxt",
+    "nuxt-swiper",
+    '@vee-validate/nuxt',
   ],
 
   googleFonts: {

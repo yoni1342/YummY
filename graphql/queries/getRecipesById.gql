@@ -1,0 +1,53 @@
+query MyQuery($id:uuid!) {
+  recipes_by_pk(recipe_id: $id){
+    created_at
+    title
+    description
+    preparation_time
+    user{
+      first_name
+      id
+      recipes_aggregate{
+        aggregate{
+          count
+        }
+      }
+    }
+    
+    recipe_images{
+      id
+      image
+    }
+    stepes(order_by:{order:asc}){
+      id
+      order
+      step_description
+    }
+    recipe_ingredients{
+      ingredient{
+        ingredient_id
+        name
+        picture
+      }
+      quantity
+      unit
+    }
+    recipe_categories{
+      category{
+        name
+        category_id
+      }
+    }
+    reviews{
+      comment
+      rating
+      created_at
+      user{
+        profile_picture
+        id
+        first_name
+        last_name
+      }
+    }
+  }
+}

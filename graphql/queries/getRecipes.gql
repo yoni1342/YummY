@@ -1,0 +1,50 @@
+query MyQuery(
+  $filter: recipes_bool_exp
+  $orderd_by: [recipes_order_by!]
+  $limit: Int
+  $offset: Int
+) {
+  recipes(
+    where: $filter
+    order_by: $orderd_by
+    limit: $limit
+    offset: $offset
+  ) {
+    created_at
+    description
+    preparation_time
+    recipe_id
+    title
+    likes_aggregate {
+      aggregate {
+        count
+      }
+    }
+    reviews_aggregate {
+      aggregate {
+        avg {
+          rating
+        }
+        count
+      }
+    }
+    recipe_images {
+      image
+      id
+    }
+    stepes {
+      id
+      order
+      step_description
+    }
+    user {
+      first_name
+      id
+      recipes_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+}

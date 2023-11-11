@@ -1,0 +1,10 @@
+mutation MyMutation($id: uuid!,$obj: users_set_input) {
+  update_users_by_pk(pk_columns: {id: $id}, _set: $obj) {
+    about_me
+    email
+    first_name
+    id
+    last_name
+    profile_picture
+  }
+}

@@ -1,0 +1,142 @@
+<template>
+    <div class="relative">
+      <div className="flex flex-col ">
+        <label htmlFor="" className="font-montserrat">
+          Filter By Catagory
+        </label>
+        <input
+          type="text"
+          placeholder="Catagory Name"
+          className="input"
+          v-model="search"
+          @click="toggle($event)"
+        />
+      </div>
+      <div
+        class="bg-white absolute max-h-52 w-52 overflow-y-scroll"
+        v-if="isDropdownOpen"
+      >
+        <div
+          class="flex items-center gap-2 p-2 hover:bg-red-50 cursor-pointer"
+          v-for="(category, index) in categories"
+          :key="index"
+          @click="handleSelect(category)"
+        >
+          <h1 class="text-lg font-semibold">{{ category.name }}</h1>
+        </div>
+      </div>
+      <div class="my-3 flex flex-wrap -m-1 z-10">
+        <!-- Selected Ingredents -->
+        <div
+          v-for="(selectCategory, index) in selectedCategories"
+          :key="index"
+          class="m-1 flex flex-wrap justify-between items-center text-xs sm:text-sm border-[1px] rounded-full hover:border-orange-300 px-4 py-2 font-bold leading-loose cursor-pointer dark:text-gray-300"
+        >
+          {{ selectCategory }}
+          <button
+            @click="removeTag(selectCategory)"
+            class="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-3 h-3 sm:h-4 sm:w-4"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                d="M6.293 6.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414L11.414 12l2.293 2.293a1 1 0 01-1.414 1.414L10 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 12 6.293 9.707a1 1 0 010-1.414z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script setup>
+  import searchCategory from "~/graphql/queries/searchCategory.gql";
+  import query from "~/composables/Query";
+  
+  const props = defineProps({
+    modelValue: {
+      type: Object,
+      default: () => ({}),
+    },
+    error: {
+      type: String,
+      default: "",
+    },
+  });
+  const emit = defineEmits(["update:modelValue",]);
+  const search = ref(props.modelValue?.name || "");
+  const selectedCategories = ref([]);
+  
+  const selectCategory = inject("selectCategory");
+  
+  
+  watch(
+    () => props.modelValue,
+    (value) => {
+      console.log("object", value.name);
+      search.value = value?.name || "";
+    }
+  );
+  
+  
+  const limit = ref(6);
+  const offset = ref(0);
+  const categories = ref([]);
+  const orderBy = ref([{ name: "asc" }]);
+  const isDropdownOpen = ref(false);
+  // const selectedIngeredent = ref("");
+  
+  const filter = computed(() => {
+    let query = {};
+    if (search.value) {
+      query.name = {
+        _ilike: `%${search.value}%`,
+      };
+    }
+    return query;
+  });
+  
+  const { onResult, loading, onError, onDone } = query(
+    filter,
+    orderBy,
+    limit,
+    offset,
+    searchCategory
+  );
+  
+  onResult((result) => {
+    categories.value = result.data.categories;
+  });
+  
+  const toggle = (event) => {
+    event.stopPropagation();
+    isDropdownOpen.value = !isDropdownOpen.value;
+  };
+  
+  const handleSelect = (category) => {
+    // selectedIngeredent.value = category;
+    if (
+      selectedCategories.value.includes(category.name) ||
+      category.value === ""
+    ) {
+      return;
+    }
+    search.value = "";
+    isDropdownOpen.value = false;
+    selectedCategories.value.push(category.name);
+    selectCategory(selectedCategories.value)
+    emit("update:modelValue", category);
+  };
+  
+  const removeTag = (name) => {
+    selectedCategories.value = selectedCategories.value.filter(
+      (t) => t !== name
+    );
+    selectCategory(selectedCategories.value)
+  
+  };
+  </script>
+  

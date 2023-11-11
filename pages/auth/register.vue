@@ -1,18 +1,21 @@
 <template>
   <div class="flex flex-col gap-4 items-center">
-    <div class="w-96 flex flex-col gap-3 px-8">
+    <form @submit.prevent="signup" class="w-96 flex flex-col gap-3 px-8">
       <div class="flex flex-col items-start">
         <label for="first-name" class="text-xs md:text-sm font-montserrat"
           >First Name</label
         >
+        <span class="text-red-500">{{ errors.first_name }}</span>
         <input
           type="text"
           name="first-name"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-xl"
-          v-model="first_name"
+          :class="[errors.first_name ? 'border-[1px] border-red-500' : '']"
+          v-bind="first_name"
         />
       </div>
       <div class="flex flex-col items-start">
+        <span class="text-red-500">{{ errors.last_name }}</span>
         <label for="last-name" class="text-xs md:text-sm font-montserrat"
           >Last Name</label
         >
@@ -20,10 +23,12 @@
           type="text"
           name="last-name"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-xl"
-          v-model="last_name"
+          :class="[errors.last_name ? 'border-[1px] border-red-500' : '']"
+          v-bind="last_name"
         />
       </div>
       <div class="flex flex-col items-start">
+        <span class="text-red-500">{{ errors.email }}</span>
         <label for="email" class="text-xs md:text-sm font-montserrat"
           >Email</label
         >
@@ -31,10 +36,12 @@
           type="email"
           name="email"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-xl"
-          v-model="email"
+          :class="[errors.email ? 'border-[1px] border-red-500' : '']"
+          v-bind="email"
         />
       </div>
       <div class="flex flex-col items-start">
+        <span class="text-red-500">{{ errors.password }}</span>
         <label for="password" class="text-xs md:text-sm font-montserrat"
           >Password</label
         >
@@ -42,10 +49,12 @@
           type="password"
           name="password"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-xl"
-          v-model="password"
+          :class="[errors.password ? 'border-[1px] border-red-500' : '']"
+          v-bind="password"
         />
       </div>
       <div class="flex flex-col items-start">
+        <span class="text-red-500">{{ errors.confirmPassword }}</span>
         <label for="confirm-password" class="text-xs md:text-sm font-montserrat"
           >Confirm Password</label
         >
@@ -53,11 +62,19 @@
           type="password"
           name="confirm-password"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-xl"
-          v-model="confirmPassword"
+          :class="[errors.confirmPassword ? 'border-[1px] border-red-500' : '']"
+          v-bind="confirmPassword"
         />
       </div>
-      <button class="btn" @click="signup">Register</button>
-    </div>
+      <button
+        :class="{ 'opacity-50': loading }"
+        :disabled="loading"
+        type="submit"
+        class="btn"
+      >
+        {{ loading ? "Registering" : "Register" }}
+      </button>
+    </form>
 
     <div>
       <p class="text-xs md:text-sm font-montserrat">
@@ -74,36 +91,61 @@
 <script setup>
 import { SignOutMutation } from "~/graphql/auth.graphql";
 import { toast } from "vue3-toastify";
+import * as yup from "yup";
+
+// import {useForm} from "@vee-validate/nuxt"
+
+const { defineInputBinds, handleSubmit, errors, setFieldError } = useForm({
+  validationSchema: yup.object({
+    first_name: yup.string().required("First name is required"),
+    last_name: yup.string().required("Last name is required"),
+    email: yup
+      .string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    password: yup
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "Passwords must match")
+      .required("Password confirmation is required"),
+  }),
+});
 
 const router = useRouter();
-const email = ref("");
-const first_name = ref("");
-const last_name = ref("");
-const password = ref("");
-const confirmPassword = ref("");
+const email = defineInputBinds("email");
+const first_name = defineInputBinds("first_name");
+const last_name = defineInputBinds("last_name");
+const password = defineInputBinds("password");
+const confirmPassword = defineInputBinds("confirmPassword");
 
-const { mutate, loading } = useMutation(SignOutMutation);
+const { mutate, loading, onDone, onError } = useMutation(SignOutMutation);
 
-const signup = () => {
-  const variables = {
-    email: email.value,
-    first_name: first_name.value,
-    last_name: last_name.value,
-    password: password.value,
+const signup = handleSubmit((values, { setFieldError }) => {
+  const input = {
+    first_name: values.first_name,
+    last_name: values.last_name,
+    email: values.email,
+    password: values.password,
+    confirmPassword: values.confirmPassword,
   };
+  mutate(input);
+});
 
-  mutate(variables)
-    .then((result) => {
-      if (result.data.signup.success) {
-        console.log(result);
-        router.push("/auth/verify-email");
-      }
-    })
-    .catch((error) => {
-      err.value.message = error.message;
-      toast.error(error.message);
-    });
-};
+onDone((result) => {
+  if (result.data.signup.success) {
+    console.log(result);
+    router.push("/auth/verify-email");
+  }
+});
+onError((error) => {
+  toast.error("Something went wrong", {
+    transition: toast.TRANSITIONS.FLIP,
+    position: toast.POSITION.TOP_RIGHT,
+  });
+});
 
 definePageMeta({
   title: "Register",

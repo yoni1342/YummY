@@ -42,7 +42,32 @@
         <!-- Image display area -->
         <div v-if="previewImages.length" class="mt-4 flex gap-4 flex-wrap">
           <div v-for="(image, index) in previewImages" :key="index">
-            <ImageuploadDisplay :url="image" @remove-image="removeImage"/>
+            <div class="relative group">
+              <img
+                :src="image"
+                alt="Uploaded Image"
+                class="w-20 h-20 rounded-full mr-2 mb-2 object-cover"
+              />
+              <div
+                class="bg-black/20 absolute top-0 h-full w-full hidden group-hover:block"
+              >
+                <button
+                  @click="removeImage(index)"
+                  class="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-3 h-3 sm:h-4 sm:w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M6.293 6.293a1 1 0 011.414 0L10 10.586l2.293-2.293a1 1 0 111.414 1.414L11.414 12l2.293 2.293a1 1 0 01-1.414 1.414L10 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 12 6.293 9.707a1 1 0 010-1.414z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -52,6 +77,14 @@
 
 <script setup>
 // ...
+
+const props = defineProps({
+  modelValue: {
+    type: Array,
+    default: () => [],
+  },
+});
+const emit = defineEmits(["update:modelValue"]);
 
 const previewImages = ref([]);
 const base64Images = ref([]);
@@ -68,9 +101,13 @@ const addImageToUploadList = (file) => {
       const imageUrl = event.target.result;
       base64Images.value.push(imageUrl.split(",")[1]);
     };
-    
+
     const imageUrl = URL.createObjectURL(file);
     previewImages.value.push(imageUrl);
+    console.log(base64Images.value);
+    // console.log(base64Images.value);
+
+    emit("update:modelValue", [...base64Images.value]);
   }
 };
 
@@ -89,10 +126,14 @@ const handleFileInput = (event) => {
   }
 };
 
-const removeImage = (imageUrl)=>{
-  console.log(imageUrl)
-  console.log(previewImages.value)
-  previewImages.value = previewImages.value.filter((image)=> image !== imageUrl)
-}
-
+const removeImage = (idx) => {
+  previewImages.value = previewImages.value.filter(
+    (image, index) => index !== idx
+  );
+  base64Images.value = base64Images.value.filter(
+    (image, index) => index !== idx
+  );
+  // console.log(base64Images.value);
+  emit("update:modelValue", base64Images.value);
+};
 </script>

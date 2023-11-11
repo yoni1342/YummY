@@ -1,29 +1,31 @@
 <template>
   <div class="flex flex-col gap-4 items-center">
-    <div class="w-96 flex flex-col gap-3 my-5 px-8">
+    <form @submit.prevent="login" class="w-96 flex flex-col gap-3 my-5 px-8">
       <!-- Email -->
       <div class="flex flex-col items-start">
         <label for="email" class="text-xs md:text-sm">Email</label>
+        <span class="text-red-500">{{ errors.email }}</span>
         <input
           type="email"
           name="email"
           class="bg-primary/5 font-montserrat outline-none p-3 w-full rounded-2xl"
-          v-model="email"
+          v-bind="email"
         />
       </div>
 
       <!-- Password -->
       <div class="flex flex-col items-start">
         <label for="password" class="text-xs md:text-sm">Password</label>
+        <span class="text-red-500">{{ errors.password }}</span>
         <input
           type="password"
           name="password"
           class="bg-primary/5 font-montserrat outline-none rounded-2xl p-3 w-full"
-          v-model="password"
+          v-bind="password"
         />
       </div>
-      <button class="btn" @click="login">Login</button>
-    </div>
+      <button class="btn" type="submit">Login</button>
+    </form>
 
     <div>
       <p class="text-xs md:text-sm">
@@ -43,30 +45,36 @@ import { SignInMutation } from "~/graphql/auth.graphql";
 import Cookies from "js-cookie";
 import { toast } from "vue3-toastify";
 import { useUserStore } from "~/stores/user";
+import * as yup from "yup";
 
+const { defineInputBinds, handleSubmit, errors, setFieldError } = useForm({
+  validationSchema: yup.object({
+    email: yup
+      .string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    password: yup
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  }),
+});
 
 const { mutate, onDone, loading, onError } = useAuth(SignInMutation);
-const email = ref("");
-const password = ref("");
-const userStore = useUserStore(); 
+const email = defineInputBinds("email");
+const password = defineInputBinds("password");
+const userStore = useUserStore();
 
 
-const login = () => {
-  // if (v$.value.$invalid) {
-  //   toast.error("Please fill all the fields", {
-  //     transition: toast.TRANSITIONS.FLIP,
-  //     position: toast.POSITION.TOP_RIGHT,
-  //   });
-  //   return;
-  // }
+const login = handleSubmit((values, { setFieldError }) => {
 
   const input = {
-    email: email.value,
-    password: password.value,
+    email: values.email,
+    password: values.password,
   };
-  console.log(input);
   mutate(input);
-};
+});
+
 onDone((result) => {
   toast.success("user loggedin", {
     transition: toast.TRANSITIONS.FLIP,
@@ -76,7 +84,7 @@ onDone((result) => {
     expires: 7,
   });
   const data = result.data.signIn.data;
-  // console.log(data)
+  console.log(data);
   userStore.setUser(data);
   navigateTo("/admin", { replace: true });
 });

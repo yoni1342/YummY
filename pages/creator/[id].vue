@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!loading">
     <div>
       <Nav />
     </div>
@@ -10,7 +10,7 @@
         <div class="flex-1">
           <!-- image -->
           <NuxtImg
-            src="https://cdn.hswstatic.com/gif/play/0b7f4e9b-f59c-4024-9f06-b3dc12850ab7-1920-1080.jpg"
+            :src="userInfo.profile_picture"
             height="50"
             class="w-[200px] h-[200px] lg:w-[600px] lg:h-[600px] object-cover rounded-full"
           />
@@ -22,15 +22,11 @@
             <div
               class="text-center text-[30px] lg:text-[60px] font-quicksand first-letter:text-primary"
             >
-              Yonatan Tesfaye
+              {{ userInfo.first_name }} {{ userInfo.last_name }}
             </div>
             <!-- About  -->
             <div class="text-lg font-montserrat">
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-              nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-              erat, sed diam voluptua. At vero eos et accusam et justo duo
-              dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
-              sanctus est Lorem ipsum dolor sit amet.
+              {{ userInfo.about_me }}
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -39,20 +35,36 @@
               icon="arcticons:enrecipes"
               class="text-primary font-bold w-8 h-8"
             />
-            <p class="text-lg font-light text-primary">22 recipes</p>
+            <p class="text-lg font-light text-primary">
+              {{ userInfo.recipes_aggregate.aggregate.count }} recipes
+            </p>
           </div>
         </dev>
       </div>
       <!-- Recipe list -->
       <div class="flex flex-col gap-4 my-20 items-center lg:items-end">
         <h2 class="text-2xl font-quicksand font-semibold">All Recipies</h2>
-        <RecipeCardList />
+        <RecipeCardList :recipes="userInfo.recipes" />
       </div>
     </div>
     <Footer />
-  </div>    
+  </div>
+  <div v-else>
+    <ModalLoading message="loading...." />
+  </div>
 </template>
 
 <script setup>
 import { Icon } from "@iconify/vue";
+import Query from "~/composables/singleQuery";
+import GetUserByIdQuery from "~/graphql/queries/getUserById.gql";
+const route = useRoute();
+const id = route.params.id;
+const userInfo = ref({});
+const { onResult, loading, onError, refetch } = Query(id, GetUserByIdQuery);
+
+onResult((result) => {
+  console.log(result.data.users_by_pk);
+  userInfo.value = result.data.users_by_pk;
+});
 </script>

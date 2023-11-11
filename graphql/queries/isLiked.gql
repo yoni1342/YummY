@@ -1,0 +1,6 @@
+query MyQuery($filter: likes_bool_exp!) {
+  likes(where: $filter) {
+    user_id
+    recipe_id
+  }
+}

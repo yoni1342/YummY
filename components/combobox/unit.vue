@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-end gap-4">
+  <div class="flex relative items-end gap-4">
     <div class="">
       <div
         class="bg-primary text-white w-full flex items-center p-2 hover:cursor-pointer"
@@ -11,7 +11,7 @@
       </div>
       <div
         v-show="openCombobox"
-        class="absolute shadow-lg min-w-fit max-h-40 overflow-y-scroll"
+        class="absolute bg-white shadow-lg min-w-fit max-h-40 overflow-y-scroll"
       >
         <div
           v-for="(unit, index) in units"

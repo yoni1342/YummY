@@ -1,12 +1,12 @@
 <!-- layouts/admin.vue -->
 <template>
   <div class="h-screen">
-    <div>
+    <div class="px-[30px] py-3">
       <Nav />
     </div>
     <div class="flex h-[85%]">
       <!-- Side Bar -->
-      <div class="bg-white flex-[15%] m-5 rounded-xl shadow-xl">
+      <div class="bg-white flex-[15%] m-5 rounded-xl shadow-xl ">
         <SideBar />
       </div>
 

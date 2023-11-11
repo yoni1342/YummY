@@ -1,0 +1,8 @@
+mutation MyMutation($input: reviews_insert_input!) {
+  insert_reviews_one(object: $input) {
+    rating
+    comment
+    recipe_id
+    user_id
+  }
+}

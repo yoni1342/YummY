@@ -15,6 +15,11 @@
               HOME
             </div>
           </nuxt-link>
+          <nuxt-link to="/recipe" exact-active-class="text-primary">
+            <div class="hover:text-primary cursor-pointer font-montserrat">
+              RECIPE
+            </div>
+          </nuxt-link>
           <div class="hover:text-primary cursor-pointer font-montserrat">
             ABOUT
           </div>
@@ -25,32 +30,6 @@
       </div>
 
       <div class="hidden lg:flex items-center gap-3">
-        <!-- Search -->
-        <div class="">
-          <div
-            class="flex items-center rounded-xl border-[1px] border-primary hover:bg-primary/20 px-2 py-1"
-          >
-            <div
-              class="px-2 py-1 rounded-xl flex items-center gap-1 hover:bg-white/50 cursor-pointer"
-            >
-              <div class="">
-                <Icon icon="carbon:search" class="text-black" />
-              </div>
-              <input
-                class="outline-none ` px-2 bg-primary/0 group-hover:bg-white/50"
-              />
-            </div>
-            <div
-              class="px-2 py-1 flex items-center gap-1 rounded-xl hover:bg-white/50 cursor-pointer"
-            >
-              <div>Recipe</div>
-              <div>
-                <Icon icon="mingcute:down-line" class="text-black" />
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Right side -->
         <div v-if="!isLogedin" class="hidden lg:flex">
           <div class="flex gap-5">
@@ -66,13 +45,18 @@
             </nuxt-link>
           </div>
         </div>
-        <div v-else="isLogedin" class="hidden lg:flex">
+
+        <div v-else class="hidden lg:flex">
           <div class="flex gap-5">
-            <Icon
-              icon="carbon:user-avatar"
-              class="w-10 h-10 hover:text-primary cursor-pointer"
-            />
-            <div class="btn" @click="isLogedin = false">Logout</div>
+            <nuxt-link to="/admin/edit-profile" >
+              <img
+                :src="userStore.user.profile_picture"
+                class="w-10 h-10 rounded-full object-cover p-1 cursor-pointer"
+              />
+            </nuxt-link>
+            <nuxt-link to="/">
+              <div class="btn" @click="userStore.logOut">Logout</div>
+            </nuxt-link>
           </div>
         </div>
       </div>
@@ -170,7 +154,10 @@
 
 <script setup>
 import { Icon } from "@iconify/vue";
+import { useUserStore } from "~/stores/user";
+const userStore = useUserStore();
+
 const showSideBar = ref(false);
 const showSearch = ref(false);
-const isLogedin = ref(true);
+const isLogedin = ref(userStore.isAuthenticated);
 </script>

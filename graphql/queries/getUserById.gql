@@ -1,0 +1,40 @@
+query MyQuery($id: uuid!) {
+  users_by_pk(id: $id) {
+    about_me
+    email
+    first_name
+    id
+    last_name
+    profile_picture
+    recipes_aggregate{
+      aggregate{
+        count
+      }
+    }
+    recipes{
+      likes_aggregate{
+        aggregate{
+          count
+        }
+      },
+      recipe_id
+      recipe_images{
+        image
+      },
+      title
+      reviews_aggregate{
+        aggregate{
+          avg{
+            rating
+          }
+        }
+        aggregate{
+          count
+        }
+      }
+      user{
+        first_name
+      }
+    }
+  }
+}

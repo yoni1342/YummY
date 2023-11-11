@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="relative">
     <div className="flex flex-col mt-6">
       <label htmlFor="" className="font-montserrat">
         Search Ingredient
@@ -42,19 +42,24 @@ const props = defineProps({
     default: "",
   },
 });
-// console.log("object", props.modelValue?.name);
-const search = computed(() => {
-  return props.modelValue?.name|| "";
+const emit = defineEmits(["update:modelValue"]);
+const search = ref(props.modelValue?.name || "");
+watch(() => props.modelValue, (value) => {
+  console.log("object", value.name);
+  search.value = value?.name || "";
 });
+
+// const search = computed(()=>{
+//     return props.modelValue?.name || ''
+// })
 
 const limit = ref(6);
 const offset = ref(0);
 const ingredients = ref([]);
 const orderBy = ref([{ name: "asc" }]);
 const isDropdownOpen = ref(false);
-const selectedIngeredent = ref("");
+// const selectedIngeredent = ref("");
 
-const emit = defineEmits(["update:modelValue"]);
 
 const filter = computed(() => {
   let query = {};
@@ -78,13 +83,13 @@ onResult((result) => {
   ingredients.value = result.data.ingredients;
 });
 
-const toggle = (event) => {
-  event.stopPropagation();
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
+  const toggle = (event) => {
+    event.stopPropagation();
+    isDropdownOpen.value = !isDropdownOpen.value;
+  };
 
 const handleSelect = (ingredient) => {
-  selectedIngeredent.value = ingredient;
+  // selectedIngeredent.value = ingredient;
   search.value = ingredient.name;
   isDropdownOpen.value = false;
   emit("update:modelValue", ingredient);
